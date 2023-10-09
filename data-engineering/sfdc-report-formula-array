@@ -1,0 +1,19 @@
+"[ " &
+
+    TEXT(CEILING( MONTH ( DATEVALUE(CREATED_DATE) ) / 3 )) & "," &
+    TEXT(CEILING( MONTH ( CLOSE_DATE ) / 3 ))  & "," &
+    '\"' &
+    IF(
+        ISBLANK(TEXT(Opportunity.PrimaryOffering__c)),
+        TEXT(Opportunity.SalesEngineerPrimaryProduct__c) , 
+        TEXT(Opportunity.PrimaryOffering__c)
+        )   & 
+        '\"' &
+        "," &
+    IF(
+        ISBLANK(Opportunity.NetSuitePartnerDealType__c),
+        "FALSE",
+        "TRUE")
+          &
+" ]"
+    

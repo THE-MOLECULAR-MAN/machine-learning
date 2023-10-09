@@ -1,0 +1,24 @@
+\"quarter_created\": "
+TEXT(CEILING( MONTH ( DATEVALUE(CREATED_DATE) ) / 3 )) & 
+    ", \"quarter_closed\": " &
+    TEXT(CEILING( MONTH ( CLOSE_DATE ) / 3 ))  & 
+    ",
+
+
+"{ " &
+
+    "\"primary_product\": \"" &
+    IF(
+        ISBLANK(TEXT(Opportunity.PrimaryOffering__c)),
+        TEXT(Opportunity.SalesEngineerPrimaryProduct__c) , 
+        TEXT(Opportunity.PrimaryOffering__c)
+        )   &
+    
+    "\", \"partner_involved\":" &
+    
+    IF(
+        ISBLANK(Opportunity.NetSuitePartnerDealType__c),
+        "false",
+        "true")
+          &
+", \"weight\":1 }"
