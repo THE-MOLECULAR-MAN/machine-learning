@@ -41,12 +41,26 @@ aws sagemaker list-auto-ml-jobs    --query \
 echo "Pipelines executing:"
 aws sagemaker list-pipeline-executions --pipeline-name comedy-bang-bang-p-sj5f7fkuowj8 --query "PipelineExecutionSummaries[?PipelineExecutionStatus=='Executing']"
 
+echo "Apps:"
+aws sagemaker list-apps --query "Apps[?Status=='InService']"
+
+echo "Domains:"
+aws sagemaker list-domains
+
+
 # needs more info:
 # echo "Training jobs for hyper-parameter tuning jobs:"
+# aws sagemaker list-pipeline-executions
 # aws sagemaker list-training-jobs-for-hyper-parameter-tuning-job --hyper-parameter-tuning-job-name 
 
 echo "check-sagemaker-billable-resources.sh finished successfully"
 
 # Don't have status fields:
+# aws sagemaker list-experiments
 # aws sagemaker list-actions
-# list-apps
+# aws sagemaker list-pipelines
+
+aws sagemaker list-studio-lifecycle-configs
+
+
+# aws sagemaker list-trials
