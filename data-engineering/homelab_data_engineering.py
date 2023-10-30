@@ -13,6 +13,7 @@ import sys
 import csv
 import getopt
 import pathlib
+import re
 
 import pandas as pd
 
@@ -70,3 +71,35 @@ def output_dataframe_to_csv(df_working, output_filename):
     """x"""
     df_working.to_csv(output_filename, header=True, index=False,
               quoting=csv.QUOTE_NONNUMERIC)
+
+# def convert_cbb_guest_instance_to_dict(single_guest_appearance_as_str):
+#     """x"""
+#     result = {}
+    
+#     # make sure it's not empty string
+#     assert single_guest_appearance_as_str.length() > 0
+    
+#     # make sure it doesn't have a delimiter in it
+#     assert not re.search(';', single_guest_appearance_as_str)
+        
+#     if re.search(' as ', single_guest_appearance_as_str):
+#         print('actor playing at least one character')
+#     else:
+#         print('actor is not playing character')
+#         assert not re.search(',', single_guest_appearance_as_str)
+#         assert not re.search('/', single_guest_appearance_as_str)
+#         return {single_guest_appearance_as_str: 'self'}
+
+# def convert_cbb_guest_and_character_list(single_episode_guest_list_str):
+#     """x"""
+#     single_episode_guest_list_array = single_episode_guest_list_str.split(';')
+    
+#     result = {}
+    
+#     for iter_str in single_episode_guest_list_array:
+#         tmp = convert_cbb_guest_instance_to_dict(iter_str)
+#         result[tmp.key]=tmp.value
+    
+#     return result
+
+    
