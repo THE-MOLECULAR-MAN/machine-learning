@@ -2,12 +2,6 @@
 # Tim H 2023
 """This is a library of reused functions for my data engineering."""
 # This script is not directly executable.
-#
-# import csv
-# import sys
-# import getopt
-# import pandas as pd
-
 
 import sys
 import csv
@@ -17,16 +11,29 @@ import re
 
 import pandas as pd
 
-
-
 # __name__ = 'homelab_data_engineering'
-# year_week_concatenator = '_wk_'
+
 YEAR_WEEK_CONCATENATOR = '_wk_'
+
+REPLACE_LIST_IN_CHAR = {"himself": "",
+                        "herself": "",
+                        "themself": "",
+                        " and ": ";",
+                        ",": ";",
+                        "  ": " ",
+                        ";;": ";"}
+
+
+def replace_all(text, dic):
+    """searches a string and replaces all instances of found key/values """
+    for i, j in dic.items():
+        text = text.replace(i, j)
+    return text
 
 
 def add_year_week_of_column(dfx):
     """adds a new column to an existing Pandas dataframe that includes the
-    year and week number. Used for easily doing group-by statements in 
+    year and week number. Used for easily doing group-by statements in
     reporting"""
     # variables in Python are passed by reference, not value
     # Gotcha: dfx must have a column named 'date' that is of data type timestamp
@@ -50,6 +57,7 @@ def add_year_week_of_column(dfx):
         # assign it in-place:
         dfx['year_week_number'][ind] = new_column_value
 
+
 def get_input_output_files(argv_param, new_suffix):
     """x"""
     # new_suffix must include the leading period: ex: .csv
@@ -60,46 +68,90 @@ def get_input_output_files(argv_param, new_suffix):
             sys.exit()
         elif opt in ("-i", "--input"):
             input_filename = arg
-            output_filename = pathlib.Path(input_filename).with_suffix(new_suffix)
+            output_filename = pathlib.Path(
+                input_filename).with_suffix(new_suffix)
             return input_filename, output_filename
 
+
 def load_json_file_into_pandas_dataframe(input_filename):
-    """x"""
+    """Load a .JSON file into a Pandas Dataframe"""
     return pd.read_json(input_filename)
 
+
+def load_csv_file_into_pandas_dataframe(input_filename):
+    """Load a .CSV file into a Pandas Dataframe"""
+    return pd.read_csv(input_filename)
+
+
 def output_dataframe_to_csv(df_working, output_filename):
-    """x"""
+    """Write out a Pandas dataframe to a CSV file, including headers
+    and quote all non-numeric characters
+    designed for training data"""
     df_working.to_csv(output_filename, header=True, index=False,
-              quoting=csv.QUOTE_NONNUMERIC)
+                      quoting=csv.QUOTE_NONNUMERIC)
 
-# def convert_cbb_guest_instance_to_dict(single_guest_appearance_as_str):
-#     """x"""
-#     result = {}
-    
-#     # make sure it's not empty string
-#     assert single_guest_appearance_as_str.length() > 0
-    
-#     # make sure it doesn't have a delimiter in it
-#     assert not re.search(';', single_guest_appearance_as_str)
-        
-#     if re.search(' as ', single_guest_appearance_as_str):
-#         print('actor playing at least one character')
-#     else:
-#         print('actor is not playing character')
-#         assert not re.search(',', single_guest_appearance_as_str)
-#         assert not re.search('/', single_guest_appearance_as_str)
-#         return {single_guest_appearance_as_str: 'self'}
 
-# def convert_cbb_guest_and_character_list(single_episode_guest_list_str):
-#     """x"""
-#     single_episode_guest_list_array = single_episode_guest_list_str.split(';')
-    
-#     result = {}
-    
-#     for iter_str in single_episode_guest_list_array:
-#         tmp = convert_cbb_guest_instance_to_dict(iter_str)
-#         result[tmp.key]=tmp.value
-    
-#     return result
+def output_dataframe_to_csv_without_header(df_working, output_filename):
+    """Write out a Pandas dataframe to a CSV file, WITHOUT headers
+    and quote all non-numeric characters
+    Designed for test data"""
+    df_working.to_csv(output_filename, header=False, index=False,
+                      quoting=csv.QUOTE_NONNUMERIC)
 
-    
+
+def convert_cbb_guest_instance_to_dict(single_guest_appearance_as_str):
+    """Converts a string that has a single guest and one or more characters
+    a list of actors (Guests) and a list of characters they play"""
+    # make sure it's not empty string
+    assert len(single_guest_appearance_as_str) > 0
+
+    # make sure it doesn't have a reserved delimiter in it
+    assert not re.search(';', single_guest_appearance_as_str)
+
+    # if the guest plays at least one character, it will have ' as ' in it
+    if re.search(' as ', single_guest_appearance_as_str):
+        # extract guest name and list of characters
+        actor_name,  character_list_as_str = single_guest_appearance_as_str.split(
+            ' as ', 1)
+        # strip out "as himself" or "as herself" and other non-characters
+        character_list_as_array = replace_all(
+            character_list_as_str, REPLACE_LIST_IN_CHAR).split(';')
+        if '' in character_list_as_array:
+            character_list_as_array.remove('')
+        # remove both leading and trailing whitespace from the character name
+        character_list_as_array = [i.strip() for i in character_list_as_array]
+        return actor_name, character_list_as_array
+    else:
+        # guest doesn't play a character, just themselves
+        # return an empty array for character list
+        # assert not re.search(',', single_guest_appearance_as_str)
+        # assert not re.search('/', single_guest_appearance_as_str)
+        return single_guest_appearance_as_str, []
+
+
+def convert_cbb_guest_and_character_list(single_episode_guest_list_str):
+    """Takes the ; delimited list of guests and characters for a single
+    episode. Converts them into two arrays: one for guests (actors) and one
+    for characters"""
+
+    # split out the episode guest list string into an array using the delimiter
+    single_episode_guest_list_array = single_episode_guest_list_str.split(';')
+
+    # define empty arrays
+    actors = []
+    characters = []
+
+    # iterate through each guest/actor and what characters they play (if any)
+    for iter_str in single_episode_guest_list_array:
+        next_actor, next_character = convert_cbb_guest_instance_to_dict(
+            iter_str)
+
+        # add the actor if there is one
+        if len(next_actor) > 0:
+            actors.append(next_actor)
+
+        # add the character(s) if there are at least 1
+        if len(next_character) > 0:
+            characters = characters + next_character
+
+    return actors, characters
