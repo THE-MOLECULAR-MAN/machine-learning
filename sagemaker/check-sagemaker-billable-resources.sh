@@ -41,11 +41,11 @@ aws sagemaker list-auto-ml-jobs    --query \
 echo "Pipelines executing:"
 aws sagemaker list-pipeline-executions --pipeline-name comedy-bang-bang-p-sj5f7fkuowj8 --query "PipelineExecutionSummaries[?PipelineExecutionStatus=='Executing']"
 
-echo "Apps:"
-aws sagemaker list-apps --query "Apps[?Status=='InService']"
+# echo "Apps:"
+# aws sagemaker list-apps --query "Apps[?Status=='InService']"
 
-echo "Domains:"
-aws sagemaker list-domains
+# echo "Domains:"
+# aws sagemaker list-domains
 
 
 # needs more info:
@@ -60,7 +60,7 @@ echo "check-sagemaker-billable-resources.sh finished successfully"
 # aws sagemaker list-actions
 # aws sagemaker list-pipelines
 
-aws sagemaker list-studio-lifecycle-configs
+# aws sagemaker list-studio-lifecycle-configs
 
 
 # aws sagemaker list-trials
