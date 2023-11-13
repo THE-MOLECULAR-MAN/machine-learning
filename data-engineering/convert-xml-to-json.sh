@@ -11,8 +11,8 @@
 
 set -e
 
-XML_FILE_TO_CONVERT="./podcasts/comedybangbang.xml"
-OUTPUT_FILE="./podcasts/comedybangbang.json"
+XML_FILE_TO_CONVERT="comedybangbang_podcast_feed.xml"
+OUTPUT_FILE="comedybangbang.json"
 OUTPUT_FILE_SIMPLIFIED="./podcasts/comedybangbang_simplified.json"
 
 # mark file as read-only just in case I make changes
@@ -40,3 +40,9 @@ jq '.rss.channel.item' "$OUTPUT_FILE" > "$OUTPUT_FILE_SIMPLIFIED"
 jsonlint --quiet "$OUTPUT_FILE_SIMPLIFIED" || echo "JSON Lint failed"
 
 echo "convert-xml-to-json.sh finished successfully."
+
+
+# stuff for Medium article
+wget -o podcast_feed.xml https://podcast.com/feed.xml
+xq . podcast_feed.xml > podcast_feed.json
+jq '.rss.channel.item' podcast_feed.json > podcast_episodes.json
