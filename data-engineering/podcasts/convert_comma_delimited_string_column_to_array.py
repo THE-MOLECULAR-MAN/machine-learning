@@ -15,7 +15,7 @@ col1,col2,col3
 """
 
 # example Bash call:
-# python3 ./convert_comma_delimited_string_column_to_array.py -i '/Users/redacted/Downloads/Comedy_bang_bang_podcast_dataset-v2.csv'
+# python3 ./convert_comma_delimited_string_column_to_array.py -i "$HOME/Downloads/Comedy_bang_bang_podcast_dataset - full_dataset.csv"
 # head '/Users/redacted/Downloads/Comedy_bang_bang_podcast_dataset-v2.csv-array-converted.csv'
 
 import csv
@@ -43,9 +43,10 @@ def main(argv):
 
     df_data = pd.read_csv(input_filename, header=0)
 
-    column_name_to_convert = 'guest_list_comma_delimited'
+    column_name_to_convert = 'guests_and_characters_from_wikipedia_semicolon_delimited'
     new_column_name = 'guest_list_as_array'
 
+    # next line has the issue
     df_data[new_column_name] = df_data[column_name_to_convert].str.split(',')
 
     print(df_data)

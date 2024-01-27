@@ -13,12 +13,6 @@ set -e
 echo "Endpoints:"
 aws sagemaker list-endpoints
 
-echo "Compilation Jobs:"
-aws sagemaker list-compilation-jobs
-
-echo "Inference experiments:"
-aws sagemaker list-inference-experiments
-
 echo "Notebook instances:"
 aws sagemaker list-notebook-instances
 
@@ -26,6 +20,11 @@ echo "Processing jobs:"
 aws sagemaker list-processing-jobs --query \
     "ProcessingJobSummaries[?ProcessingJobStatus=='InProgress']"
 
+echo "Auto ML Jobs:"
+aws sagemaker list-auto-ml-jobs    --query \
+    "AutoMLJobSummaries[?AutoMLJobStatus=='InProgress']"
+
+sleep 2
 echo "Training jobs:"
 aws sagemaker list-training-jobs   --query \
     "TrainingJobSummaries[?TrainingJobStatus=='InProgress']"
@@ -34,12 +33,15 @@ echo "Transform Jobs:"
 aws sagemaker list-transform-jobs  --query \
     "TransformJobSummaries[?TransformJobStatus=='InProgress']"
 
-echo "Auto ML Jobs:"
-aws sagemaker list-auto-ml-jobs    --query \
-    "AutoMLJobSummaries[?AutoMLJobStatus=='InProgress']"
-
 echo "Pipelines executing:"
 aws sagemaker list-pipeline-executions --pipeline-name comedy-bang-bang-p-sj5f7fkuowj8 --query "PipelineExecutionSummaries[?PipelineExecutionStatus=='Executing']"
+
+echo "Compilation Jobs:"
+aws sagemaker list-compilation-jobs
+
+echo "Inference experiments:"
+aws sagemaker list-inference-experiments
+
 
 # echo "Apps:"
 # aws sagemaker list-apps --query "Apps[?Status=='InService']"

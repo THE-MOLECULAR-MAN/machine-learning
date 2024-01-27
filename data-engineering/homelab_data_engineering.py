@@ -30,6 +30,12 @@ def replace_all(text, dic):
         text = text.replace(i, j)
     return text
 
+def replace_all_as_str(text: str, dic: dict) -> str:
+    """searches a string and replaces all instances of found key/values """
+    for i, j in dic.items():
+        text = text.replace(i, j)
+    return str(text)
+
 
 def add_year_week_of_column(dfx):
     """adds a new column to an existing Pandas dataframe that includes the
@@ -155,3 +161,87 @@ def convert_cbb_guest_and_character_list(single_episode_guest_list_str):
             characters = characters + next_character
 
     return actors, characters
+
+
+def convert_cbb_guest_and_character_list2(single_episode_guest_list_str: str) -> list['str']:
+    """Takes the ; delimited list of guests and characters for a single
+    episode. Converts them into two arrays: one for guests (actors) and one
+    for characters"""
+
+    # split out the episode guest list string into an array using the delimiter
+    single_episode_guest_list_array = single_episode_guest_list_str.split(';')
+
+    # define empty arrays
+    actors = ""
+    characters = "none"
+
+    # iterate through each guest/actor and what characters they play (if any)
+    for iter_str in single_episode_guest_list_array:
+        next_actor, next_character = convert_cbb_guest_instance_to_strings(
+            iter_str)
+        
+        print('next actors ' + str(type(next_actor)) + ' ' + str(next_actor))
+        print('next chars  ' + str(type(next_character)) + ' ' + str(next_character))
+
+        # add the actor if there is one
+        if len(next_actor) == 0:
+            continue
+        # elif type(next_actor)
+        else:
+            #print(type(next_actor))
+            #print(next_actor)
+            if actors == "":
+                actors = str(next_actor)
+            else:
+                next_actor = str(next_actor)
+                actors = str(actors) + ';' + str(next_actor)
+
+        # add the character(s) if there are at least 1
+        if len(next_character)  == 0:
+            continue
+        elif len(next_character) == 1:
+            characters = next_character[0]
+        else:
+            # print(type(next_character))
+            #print(next_character)
+            
+            for ch in next_character:
+                if characters == "none":
+                    characters = str(ch)
+                else:
+                    characters = str(characters) + ';' + str(ch)
+
+    return str(actors), str(characters)
+
+
+
+
+
+def convert_cbb_guest_instance_to_strings(single_guest_appearance_as_str: str) -> list('str'):
+    """Converts a string that has a single guest and one or more characters
+    a list of actors (Guests) and a list of characters they play"""
+    # make sure it's not empty string
+    assert len(single_guest_appearance_as_str) > 0
+
+    # make sure it doesn't have a reserved delimiter in it
+    assert not re.search(';', single_guest_appearance_as_str)
+
+    # if the guest plays at least one character, it will have ' as ' in it
+    if re.search(' as ', single_guest_appearance_as_str):
+        # extract guest name and list of characters
+        actor_name,  character_list_as_str = single_guest_appearance_as_str.split(
+            ' as ', 1)
+        # strip out "as himself" or "as herself" and other non-characters
+        character_list_as_array = replace_all_as_str(
+            character_list_as_str, REPLACE_LIST_IN_CHAR).split(';')
+        if '' in character_list_as_array:
+            character_list_as_array.remove('')
+        # remove both leading and trailing whitespace from the character name
+        character_list_as_array = [i.strip() for i in character_list_as_array]
+        return str(actor_name), character_list_as_array
+    else:
+        # guest doesn't play a character, just themselves
+        # return an empty array for character list
+        # assert not re.search(',', single_guest_appearance_as_str)
+        # assert not re.search('/', single_guest_appearance_as_str)
+        return str(single_guest_appearance_as_str), ""
