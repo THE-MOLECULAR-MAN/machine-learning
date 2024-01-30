@@ -23,6 +23,21 @@ REPLACE_LIST_IN_CHAR = {"himself": "",
                         "  ": " ",
                         ";;": ";"}
 
+def get_balance(df, group_column_name, label_column_name, filter_column_name):
+    a, b = df.groupby([group_column_name, label_column_name]).size()[filter_column_name]
+    if a == 0 or b == 0:
+        return None
+    return b / a
+
+def compare_original_to_sample(df_orig, df_samp, column_name):
+    orig_percent   = df_orig[column_name].value_counts() / df_orig[column_name].shape[0]
+    sample_percent = df_samp[column_name].value_counts() / df_samp[column_name].shape[0]
+    # print(orig_percent)
+    # print(sample_percent)
+    difference_percent  = (sample_percent - orig_percent) / orig_percent * 100
+    print('Errors in percentage (0-100%)')
+    print(difference_percent)
+
 
 def replace_all(text, dic):
     """searches a string and replaces all instances of found key/values """
